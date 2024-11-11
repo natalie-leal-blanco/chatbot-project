@@ -4,27 +4,40 @@ from app.chatbot import Chatbot
 def create_app():
     chatbot = Chatbot()
 
-    def respond(message, chat_history):
+    def respond(message, history):
         if message.strip() == "":
-            return "", chat_history
+            return "", history
         bot_message = chatbot.generate_response(message)
-        chat_history.append((message, bot_message))
-        return "", chat_history
+        history.append((message, bot_message))
+        return "", history
 
-    demo = gr.Interface(
-        fn=respond,
-        inputs=[
-            gr.Textbox(placeholder="Type your message here..."),
-            gr.State([])
-        ],
-        outputs=[
-            gr.Textbox(),
-            gr.State()
-        ],
-        title="🤖 AI Chatbot",
-        description="Start chatting below! The model might take a few moments to respond."
-    )
-    
+    with gr.Blocks() as demo:
+        gr.Markdown("""
+        # 🤖 AI Chatbot
+        Start chatting below! The model might take a few moments to respond.
+        """)
+        
+        chatbot_component = gr.Chatbot(
+            value=[],
+            height=400,
+            bubble_full_width=False,
+            show_label=True,
+            label="Chat History"
+        )
+        
+        msg = gr.Textbox(
+            show_label=False,
+            placeholder="Type your message here...",
+            container=False
+        )
+        
+        with gr.Row():
+            clear = gr.ClearButton([msg, chatbot_component], value="Clear Chat")
+            submit = gr.Button("Send", variant="primary")
+
+        msg.submit(respond, [msg, chatbot_component], [msg, chatbot_component])
+        submit.click(respond, [msg, chatbot_component], [msg, chatbot_component])
+
     return demo
 
 # Create the demo application
@@ -34,5 +47,4 @@ demo = create_app()
 if __name__ == "__main__":
     demo.launch()
 else:
-    # This is the crucial part for HuggingFace Spaces
     app = demo.app
