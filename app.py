@@ -24,7 +24,15 @@ def create_app():
         title="🤖 AI Chatbot",
         description="Start chatting below! The model might take a few moments to respond."
     )
-
+    
     return demo
 
-app = create_app()
+# Create the demo application
+demo = create_app()
+
+# This is important for Gradio/HuggingFace Spaces deployment
+if __name__ == "__main__":
+    demo.launch()
+else:
+    # This is the crucial part for HuggingFace Spaces
+    app = demo.app
