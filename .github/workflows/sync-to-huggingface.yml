@@ -1,0 +1,32 @@
+name: Sync to Hugging Face hub
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  sync-to-hub:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          lfs: true
+      
+      - name: Configure Git
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+      
+      - name: Push to Hugging Face
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_USERNAME: ${{ secrets.HF_USERNAME }}
+        run: |
+          echo "Starting sync to Hugging Face..."
+          echo "Username: $HF_USERNAME"
+          echo "Setting up remote..."
+          git remote add space "https://$HF_USERNAME:$HF_TOKEN@huggingface.co/spaces/$HF_USERNAME/chatbot-app"
+          echo "Pushing to Hugging Face..."
+          git push space main --force
