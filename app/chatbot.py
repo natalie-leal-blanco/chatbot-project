@@ -30,7 +30,7 @@ class Chatbot:
                 outputs[:, inputs.shape[-1]:][0],
                 skip_special_tokens=True
             )
-            
+--simplify            
             return response or "I'm not sure how to respond to that."
         except Exception as e:
             print(f"Error: {str(e)}")
